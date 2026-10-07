@@ -24,34 +24,19 @@ local function noSelect(obj)
 	obj.SelectionImageObject = blank
 end
 
-local ICON_SHEET = "rbxassetid://3926305904"
-local ICON_SIZE = Vector2.new(36, 36)
-
+-- custom icon assets
 local ICONS = {
-	home     = { Vector2.new(4, 284),   ICON_SIZE },
-	settings = { Vector2.new(964, 324), ICON_SIZE },
-	info     = { Vector2.new(4, 724),   ICON_SIZE },
-	user     = { Vector2.new(964, 4),   ICON_SIZE },
-	search   = { Vector2.new(964, 324), ICON_SIZE },
-	bell     = { Vector2.new(604, 4),   ICON_SIZE },
-	shield   = { Vector2.new(724, 324), ICON_SIZE },
-	sword    = { Vector2.new(884, 324), ICON_SIZE },
-	paint    = { Vector2.new(724, 4),   ICON_SIZE },
-	code     = { Vector2.new(244, 324), ICON_SIZE },
-	chat     = { Vector2.new(124, 324), ICON_SIZE },
-	star     = { Vector2.new(844, 4),   ICON_SIZE },
-	wrench   = { Vector2.new(244, 724), ICON_SIZE },
-	eye      = { Vector2.new(604, 324), ICON_SIZE },
-	run      = { Vector2.new(484, 604), ICON_SIZE },
-	gift     = { Vector2.new(364, 364), ICON_SIZE },
+	home     = "rbxassetid://102813955767463",
+	user     = "rbxassetid://83351658050671",
+	gk       = "rbxassetid://106252567937894",
+	settings = "rbxassetid://131601842857191",
+	ball     = "rbxassetid://139930175388958",
+	misc     = "rbxassetid://86641494712416",
+	info     = "rbxassetid://86641494712416",
 }
 
-local function getIconData(name)
-	local data = ICONS[string.lower(name or "")]
-	if data then
-		return ICON_SHEET, data[1], data[2]
-	end
-	return ICON_SHEET, ICONS.info[1], ICONS.info[2]
+local function getIcon(name)
+	return ICONS[string.lower(name or "")] or ICONS.info
 end
 
 function AstralisLib:CreateWindow(config)
@@ -223,9 +208,7 @@ function AstralisLib:CreateWindow(config)
 	SearchIcon.Size = UDim2.new(0, 14, 0, 14)
 	SearchIcon.Position = UDim2.new(0, 8, 0.5, -7)
 	SearchIcon.BackgroundTransparency = 1
-	SearchIcon.Image = ICON_SHEET
-	SearchIcon.ImageRectOffset = ICONS.search[1]
-	SearchIcon.ImageRectSize = ICONS.search[2]
+	SearchIcon.Image = getIcon("settings")
 	SearchIcon.ImageColor3 = Theme.DescriptionColor
 	SearchIcon.ZIndex = 7
 	SearchIcon.Parent = SearchBar
@@ -841,7 +824,7 @@ function AstralisLib:CreateWindow(config)
 
 		local labelName = tabName or "Tab"
 		local iconKey = iconName or labelName
-		local img, offset, size = getIconData(iconKey)
+		local iconId = getIcon(iconKey)
 
 		local TabBtn = Instance.new("TextButton")
 		TabBtn.Size = UDim2.new(0, 42, 0, TAB_HEIGHT)
@@ -873,9 +856,7 @@ function AstralisLib:CreateWindow(config)
 		Icon.Size = UDim2.new(0, 20, 0, 20)
 		Icon.Position = UDim2.new(0.5, -10, 0.5, -10)
 		Icon.BackgroundTransparency = 1
-		Icon.Image = img
-		Icon.ImageRectOffset = offset
-		Icon.ImageRectSize = size
+		Icon.Image = iconId
 		Icon.ImageColor3 = Theme.TabTextColor
 		Icon.ZIndex = 5
 		Icon.Parent = TabBtn
@@ -1456,7 +1437,6 @@ function AstralisLib:CreateWindow(config)
 			local SVWhite = Instance.new("Frame")
 			SVWhite.Size = UDim2.new(1, 0, 1, 0)
 			SVWhite.BackgroundColor3 = Color3.new(1, 1, 1)
-			SVWhite.BackgroundTransparency = 0
 			SVWhite.BorderSizePixel = 0
 			SVWhite.ZIndex = 22
 			SVWhite.Parent = SV
