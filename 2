@@ -24,7 +24,7 @@ local function noSelect(obj)
 	obj.SelectionImageObject = blank
 end
 
--- custom icon assets
+-- icon lookup (optional - you can pass raw asset ids instead)
 local ICONS = {
 	home     = "rbxassetid://102813955767463",
 	user     = "rbxassetid://83351658050671",
@@ -35,8 +35,18 @@ local ICONS = {
 	info     = "rbxassetid://86641494712416",
 }
 
-local function getIcon(name)
-	return ICONS[string.lower(name or "")] or ICONS.info
+local function getIcon(nameOrId)
+	nameOrId = tostring(nameOrId or "")
+
+	if string.find(nameOrId, "rbxassetid://") then
+		return nameOrId
+	end
+
+	if tonumber(nameOrId) then
+		return "rbxassetid://" .. nameOrId
+	end
+
+	return ICONS[string.lower(nameOrId)] or ICONS.info
 end
 
 function AstralisLib:CreateWindow(config)
@@ -810,7 +820,7 @@ function AstralisLib:CreateWindow(config)
 	UserInputService.InputBegan:Connect(function(input)
 		if UserInputService:GetFocusedTextBox() then return end
 		if input.KeyCode == Theme.Keybind then
-			uiVisible = not uiVisible
+				uiVisible = not uiVisible
 			ScreenGui.Enabled = uiVisible
 			playSound()
 		end
