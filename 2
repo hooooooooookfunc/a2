@@ -986,14 +986,6 @@ function AstralisLib:CreateWindow(config)
 			Label.TextXAlignment = Enum.TextXAlignment.Left
 			Label.ZIndex = 4
 			Label.Parent = Holder
-
-			local UIGradient = Instance.new("UIGradient")
-			UIGradient.Transparency = NumberSequence.new({
-				NumberSequenceKeypoint.new(0, 1),
-				NumberSequenceKeypoint.new(0.3, 0),
-				NumberSequenceKeypoint.new(1, 0)
-			})
-			UIGradient.Parent = Label
 		end
 
 		function TabObj:CreateToggle(options)
@@ -1040,7 +1032,7 @@ function AstralisLib:CreateWindow(config)
 			Track.Size = UDim2.new(0, 44, 0, 22)
 			Track.AnchorPoint = Vector2.new(1, 0.5)
 			Track.Position = UDim2.new(1, 0, 0.5, 0)
-			Track.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
+			Track.BackgroundColor3 = default and Theme.AccentColor or Color3.fromRGB(28, 28, 32)
 			Track.BorderSizePixel = 0
 			Track.ZIndex = 4
 			Track.Parent = Holder
@@ -1056,10 +1048,6 @@ function AstralisLib:CreateWindow(config)
 			Knob.Parent = Track
 
 			addCorner(Knob, 8)
-
-			if default then
-				Track.BackgroundColor3 = Theme.AccentColor
-			end
 
 			local Hit = Instance.new("TextButton")
 			Hit.Size = UDim2.new(1, 0, 1, 0)
@@ -1196,13 +1184,13 @@ function AstralisLib:CreateWindow(config)
 			local callback = options.Callback or function() end
 
 			local Holder = Instance.new("Frame")
-			Holder.Size = UDim2.new(1, 0, 0, desc ~= "" and 58 or 38)
+			Holder.Size = UDim2.new(1, 0, 0, desc ~= "" and 46 or 30)
 			Holder.BackgroundTransparency = 1
 			Holder.ZIndex = 3
 			Holder.Parent = Page
 
 			local Btn = Instance.new("TextButton")
-			Btn.Size = UDim2.new(1, 0, 0, 34)
+			Btn.Size = UDim2.new(1, 0, 0, 26)
 			Btn.BackgroundColor3 = Theme.ButtonBackground
 			Btn.BorderSizePixel = 0
 			Btn.Text = name
@@ -1214,13 +1202,13 @@ function AstralisLib:CreateWindow(config)
 			Btn.ZIndex = 4
 			Btn.Parent = Holder
 
-			addCorner(Btn, 6)
+			addCorner(Btn, 4)
 			noSelect(Btn)
 
 			if desc ~= "" then
 				local Desc = Instance.new("TextLabel")
 				Desc.Size = UDim2.new(1, 0, 0, 14)
-				Desc.Position = UDim2.new(0, 0, 0, 38)
+				Desc.Position = UDim2.new(0, 0, 0, 30)
 				Desc.BackgroundTransparency = 1
 				Desc.Text = desc
 				Desc.Font = Theme.Font
