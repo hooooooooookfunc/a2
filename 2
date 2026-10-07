@@ -1177,7 +1177,7 @@ function AstralisLib:CreateWindow(config)
 			end)
 		end
 
-		function TabObj:CreateButton(options)
+				function TabObj:CreateButton(options)
 			options = options or {}
 			local name = options.Name or "Button"
 			local desc = options.Description or ""
@@ -1190,7 +1190,7 @@ function AstralisLib:CreateWindow(config)
 			Holder.Parent = Page
 
 			local Btn = Instance.new("TextButton")
-			Btn.Size = UDim2.new(1, 0, 0, 26)
+			Btn.Size = UDim2.new(0, 160, 0, 26)
 			Btn.BackgroundColor3 = Theme.ButtonBackground
 			Btn.BorderSizePixel = 0
 			Btn.Text = name
