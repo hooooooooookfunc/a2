@@ -92,7 +92,6 @@ function AstralisLib:CreateWindow(config)
 		TextColor = config.TextColor or Color3.fromRGB(225, 225, 230),
 		DescriptionColor = config.DescriptionColor or Color3.fromRGB(130, 130, 140),
 
-		-- new outline settings
 		OutlineColor = config.OutlineColor or Color3.fromRGB(60, 60, 66),
 		OutlineThickness = config.OutlineThickness or 1.2,
 		CornerRadius = config.CornerRadius or 10
@@ -132,39 +131,20 @@ function AstralisLib:CreateWindow(config)
 	pcall(function() ScreenGui.Parent = CoreGui end)
 	if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
-	-- ============================
-	-- OUTER FRAME (with corner + outline)
-	-- ============================
-	local Frame = Instance.new("Frame")
+	local Frame = Instance.new("CanvasGroup")
 	Frame.Size = FULL_SIZE
 	Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 	Frame.BackgroundColor3 = Theme.BackgroundColor
 	Frame.BorderSizePixel = 0
-	Frame.ClipsDescendants = false
 	Frame.Parent = ScreenGui
 
 	addCorner(Frame, Theme.CornerRadius)
 
-	-- the outline
 	local FrameStroke = Instance.new("UIStroke")
 	FrameStroke.Color = Theme.OutlineColor
 	FrameStroke.Thickness = Theme.OutlineThickness
-	FrameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	FrameStroke.Transparency = 0
 	FrameStroke.Parent = Frame
-
-	-- inner holder so all children get clipped to the rounded shape
-	local Inner = Instance.new("Frame")
-	Inner.Size = UDim2.new(1, 0, 1, 0)
-	Inner.BackgroundColor3 = Theme.BackgroundColor
-	Inner.BackgroundTransparency = 1
-	Inner.BorderSizePixel = 0
-	Inner.ClipsDescendants = true
-	Inner.ZIndex = 1
-	Inner.Parent = Frame
-
-	addCorner(Inner, Theme.CornerRadius)
 
 	if Theme.BackgroundImage ~= "" then
 		local Background = Instance.new("ImageLabel")
@@ -175,7 +155,8 @@ function AstralisLib:CreateWindow(config)
 		Background.ImageColor3 = Theme.ImageColor
 		Background.ScaleType = Enum.ScaleType.Crop
 		Background.ZIndex = 1
-		Background.Parent = Inner
+		Background.Parent = Frame
+		addCorner(Background, Theme.CornerRadius)
 	end
 
 	if Theme.OverlayTransparency < 1 then
@@ -185,7 +166,8 @@ function AstralisLib:CreateWindow(config)
 		DarkOverlay.BackgroundTransparency = Theme.OverlayTransparency
 		DarkOverlay.BorderSizePixel = 0
 		DarkOverlay.ZIndex = 1
-		DarkOverlay.Parent = Inner
+		DarkOverlay.Parent = Frame
+		addCorner(DarkOverlay, Theme.CornerRadius)
 	end
 
 	local HeaderBar = Instance.new("Frame")
@@ -193,14 +175,24 @@ function AstralisLib:CreateWindow(config)
 	HeaderBar.BackgroundColor3 = Theme.HeaderColor
 	HeaderBar.BorderSizePixel = 0
 	HeaderBar.ZIndex = 2
-	HeaderBar.Parent = Inner
+	HeaderBar.Parent = Frame
+
+	addCorner(HeaderBar, Theme.CornerRadius)
+
+	local HeaderBottomCover = Instance.new("Frame")
+	HeaderBottomCover.Size = UDim2.new(1, 0, 0, Theme.CornerRadius)
+	HeaderBottomCover.Position = UDim2.new(0, 0, 1, -Theme.CornerRadius)
+	HeaderBottomCover.BackgroundColor3 = Theme.HeaderColor
+	HeaderBottomCover.BorderSizePixel = 0
+	HeaderBottomCover.ZIndex = 4
+	HeaderBottomCover.Parent = HeaderBar
 
 	local HeaderDivider = Instance.new("Frame")
 	HeaderDivider.Size = UDim2.new(1, 0, 0, 1)
 	HeaderDivider.Position = UDim2.new(0, 0, 1, -1)
 	HeaderDivider.BackgroundColor3 = Color3.fromRGB(40, 40, 44)
 	HeaderDivider.BorderSizePixel = 0
-	HeaderDivider.ZIndex = 3
+	HeaderDivider.ZIndex = 5
 	HeaderDivider.Parent = HeaderBar
 
 	local TitleLabel = Instance.new("TextLabel")
@@ -213,7 +205,7 @@ function AstralisLib:CreateWindow(config)
 	TitleLabel.Font = Theme.TitleFont
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
-	TitleLabel.ZIndex = 3
+	TitleLabel.ZIndex = 6
 	TitleLabel.Parent = HeaderBar
 
 	local SearchBar = Instance.new("Frame")
@@ -221,7 +213,7 @@ function AstralisLib:CreateWindow(config)
 	SearchBar.Position = UDim2.new(0.5, -100, 0.5, -13)
 	SearchBar.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
 	SearchBar.BorderSizePixel = 0
-	SearchBar.ZIndex = 3
+	SearchBar.ZIndex = 6
 	SearchBar.Parent = HeaderBar
 
 	addCorner(SearchBar, 6)
@@ -234,7 +226,7 @@ function AstralisLib:CreateWindow(config)
 	SearchIcon.ImageRectOffset = ICONS.search[1]
 	SearchIcon.ImageRectSize = ICONS.search[2]
 	SearchIcon.ImageColor3 = Theme.DescriptionColor
-	SearchIcon.ZIndex = 4
+	SearchIcon.ZIndex = 7
 	SearchIcon.Parent = SearchBar
 
 	local SearchBox = Instance.new("TextBox")
@@ -249,7 +241,7 @@ function AstralisLib:CreateWindow(config)
 	SearchBox.TextColor3 = Theme.TextColor
 	SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 	SearchBox.ClearTextOnFocus = false
-	SearchBox.ZIndex = 4
+	SearchBox.ZIndex = 7
 	SearchBox.Parent = SearchBar
 
 	local CloseBtn = Instance.new("TextButton")
@@ -262,7 +254,7 @@ function AstralisLib:CreateWindow(config)
 	CloseBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
 	CloseBtn.AutoButtonColor = false
 	CloseBtn.Modal = true
-	CloseBtn.ZIndex = 3
+	CloseBtn.ZIndex = 6
 	CloseBtn.Parent = HeaderBar
 
 	noSelect(CloseBtn)
@@ -277,7 +269,7 @@ function AstralisLib:CreateWindow(config)
 	MinBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
 	MinBtn.AutoButtonColor = false
 	MinBtn.Modal = true
-	MinBtn.ZIndex = 3
+	MinBtn.ZIndex = 6
 	MinBtn.Parent = HeaderBar
 
 	noSelect(MinBtn)
@@ -306,6 +298,46 @@ function AstralisLib:CreateWindow(config)
 			BackgroundColor3 = Color3.fromRGB(32, 32, 36)
 		}):Play()
 	end)
+
+	local Body = Instance.new("Frame")
+	Body.Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT)
+	Body.Position = UDim2.new(0, 0, 0, HEADER_HEIGHT)
+	Body.BackgroundTransparency = 1
+	Body.ZIndex = 2
+	Body.Parent = Frame
+
+	local Sidebar = Instance.new("Frame")
+	Sidebar.Size = UDim2.new(0, SIDEBAR_WIDTH, 1, 0)
+	Sidebar.BackgroundColor3 = Theme.SidebarColor
+	Sidebar.BackgroundTransparency = 0
+	Sidebar.BorderSizePixel = 0
+	Sidebar.ZIndex = 2
+	Sidebar.Parent = Body
+
+	addCorner(Sidebar, Theme.CornerRadius)
+
+	local SidebarTopCover = Instance.new("Frame")
+	SidebarTopCover.Size = UDim2.new(0, Theme.CornerRadius, 0, Theme.CornerRadius)
+	SidebarTopCover.Position = UDim2.new(0, 0, 0, 0)
+	SidebarTopCover.BackgroundColor3 = Theme.SidebarColor
+	SidebarTopCover.BorderSizePixel = 0
+	SidebarTopCover.ZIndex = 3
+	SidebarTopCover.Parent = Sidebar
+
+	local SidebarDivider = Instance.new("Frame")
+	SidebarDivider.Size = UDim2.new(0, 1, 1, 0)
+	SidebarDivider.Position = UDim2.new(1, -1, 0, 0)
+	SidebarDivider.BackgroundColor3 = Color3.fromRGB(40, 40, 44)
+	SidebarDivider.BorderSizePixel = 0
+	SidebarDivider.ZIndex = 3
+	SidebarDivider.Parent = Sidebar
+
+	local ContentArea = Instance.new("Frame")
+	ContentArea.Size = UDim2.new(1, -SIDEBAR_WIDTH, 1, 0)
+	ContentArea.Position = UDim2.new(0, SIDEBAR_WIDTH, 0, 0)
+	ContentArea.BackgroundTransparency = 1
+	ContentArea.ZIndex = 2
+	ContentArea.Parent = Body
 
 	local NotifyScreen = Instance.new("ScreenGui")
 	NotifyScreen.Name = "AstralisNotifyGui"
@@ -712,35 +744,6 @@ function AstralisLib:CreateWindow(config)
 		end
 	end)
 
-	local Body = Instance.new("Frame")
-	Body.Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT)
-	Body.Position = UDim2.new(0, 0, 0, HEADER_HEIGHT)
-	Body.BackgroundTransparency = 1
-	Body.Parent = Inner
-
-	local Sidebar = Instance.new("Frame")
-	Sidebar.Size = UDim2.new(0, SIDEBAR_WIDTH, 1, 0)
-	Sidebar.BackgroundColor3 = Theme.SidebarColor
-	Sidebar.BackgroundTransparency = 0
-	Sidebar.BorderSizePixel = 0
-	Sidebar.ZIndex = 2
-	Sidebar.Parent = Body
-
-	local SidebarDivider = Instance.new("Frame")
-	SidebarDivider.Size = UDim2.new(0, 1, 1, 0)
-	SidebarDivider.Position = UDim2.new(1, -1, 0, 0)
-	SidebarDivider.BackgroundColor3 = Color3.fromRGB(40, 40, 44)
-	SidebarDivider.BorderSizePixel = 0
-	SidebarDivider.ZIndex = 3
-	SidebarDivider.Parent = Sidebar
-
-	local ContentArea = Instance.new("Frame")
-	ContentArea.Size = UDim2.new(1, -SIDEBAR_WIDTH, 1, 0)
-	ContentArea.Position = UDim2.new(0, SIDEBAR_WIDTH, 0, 0)
-	ContentArea.BackgroundTransparency = 1
-	ContentArea.ZIndex = 2
-	ContentArea.Parent = Body
-
 	local TooltipScreen = Instance.new("ScreenGui")
 	TooltipScreen.Name = "AstralisTooltipGui"
 	TooltipScreen.ResetOnSpawn = false
@@ -856,11 +859,11 @@ function AstralisLib:CreateWindow(config)
 
 		local ActiveBar = Instance.new("Frame")
 		ActiveBar.Size = UDim2.new(0, 3, 0, 0)
-		ActiveBar.Position = UDim2.new(0, -3, 0.5, 0)
+		ActiveBar.Position = UDim2.new(0, 3, 0.5, 0)
 		ActiveBar.AnchorPoint = Vector2.new(0, 0.5)
 		ActiveBar.BackgroundColor3 = Theme.AccentColor
 		ActiveBar.BorderSizePixel = 0
-		ActiveBar.ZIndex = 5
+		ActiveBar.ZIndex = 6
 		ActiveBar.Parent = TabBtn
 
 		addCorner(ActiveBar, 2)
@@ -966,6 +969,33 @@ function AstralisLib:CreateWindow(config)
 
 		local TabObj = {}
 
+		function TabObj:CreateSection(text)
+			local Holder = Instance.new("Frame")
+			Holder.Size = UDim2.new(1, 0, 0, 22)
+			Holder.BackgroundTransparency = 1
+			Holder.ZIndex = 3
+			Holder.Parent = Page
+
+			local Label = Instance.new("TextLabel")
+			Label.Size = UDim2.new(1, 0, 1, 0)
+			Label.BackgroundTransparency = 1
+			Label.Text = string.upper(text or "SECTION")
+			Label.Font = Theme.Font
+			Label.TextSize = 11
+			Label.TextColor3 = Theme.DescriptionColor
+			Label.TextXAlignment = Enum.TextXAlignment.Left
+			Label.ZIndex = 4
+			Label.Parent = Holder
+
+			local UIGradient = Instance.new("UIGradient")
+			UIGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 1),
+				NumberSequenceKeypoint.new(0.3, 0),
+				NumberSequenceKeypoint.new(1, 0)
+			})
+			UIGradient.Parent = Label
+		end
+
 		function TabObj:CreateToggle(options)
 			options = options or {}
 			local name = options.Name or "Toggle"
@@ -1020,12 +1050,16 @@ function AstralisLib:CreateWindow(config)
 			local Knob = Instance.new("Frame")
 			Knob.Size = UDim2.new(0, 16, 0, 16)
 			Knob.Position = default and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
-			Knob.BackgroundColor3 = default and Theme.AccentColor or Theme.ToggleOffColor
+			Knob.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
 			Knob.BorderSizePixel = 0
 			Knob.ZIndex = 5
 			Knob.Parent = Track
 
 			addCorner(Knob, 8)
+
+			if default then
+				Track.BackgroundColor3 = Theme.AccentColor
+			end
 
 			local Hit = Instance.new("TextButton")
 			Hit.Size = UDim2.new(1, 0, 1, 0)
@@ -1046,8 +1080,11 @@ function AstralisLib:CreateWindow(config)
 				state = not state
 
 				TweenService:Create(Knob, info, {
-					Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8),
-					BackgroundColor3 = state and Theme.AccentColor or Theme.ToggleOffColor
+					Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
+				}):Play()
+
+				TweenService:Create(Track, info, {
+					BackgroundColor3 = state and Theme.AccentColor or Color3.fromRGB(28, 28, 32)
 				}):Play()
 
 				callback(state)
@@ -1159,13 +1196,13 @@ function AstralisLib:CreateWindow(config)
 			local callback = options.Callback or function() end
 
 			local Holder = Instance.new("Frame")
-			Holder.Size = UDim2.new(1, 0, 0, desc ~= "" and 48 or 34)
+			Holder.Size = UDim2.new(1, 0, 0, desc ~= "" and 58 or 38)
 			Holder.BackgroundTransparency = 1
 			Holder.ZIndex = 3
 			Holder.Parent = Page
 
 			local Btn = Instance.new("TextButton")
-			Btn.Size = UDim2.new(0, 160, 0, 28)
+			Btn.Size = UDim2.new(1, 0, 0, 34)
 			Btn.BackgroundColor3 = Theme.ButtonBackground
 			Btn.BorderSizePixel = 0
 			Btn.Text = name
@@ -1177,13 +1214,13 @@ function AstralisLib:CreateWindow(config)
 			Btn.ZIndex = 4
 			Btn.Parent = Holder
 
-			addCorner(Btn, 4)
+			addCorner(Btn, 6)
 			noSelect(Btn)
 
 			if desc ~= "" then
 				local Desc = Instance.new("TextLabel")
 				Desc.Size = UDim2.new(1, 0, 0, 14)
-				Desc.Position = UDim2.new(0, 0, 0, 30)
+				Desc.Position = UDim2.new(0, 0, 0, 38)
 				Desc.BackgroundTransparency = 1
 				Desc.Text = desc
 				Desc.Font = Theme.Font
