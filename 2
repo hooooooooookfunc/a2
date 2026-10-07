@@ -986,16 +986,18 @@ function AstralisLib:CreateWindow(config)
 			local default = options.Default or false
 			local callback = options.Callback or function() end
 
+			local hasDesc = (desc ~= nil and desc ~= "")
+
 			local Holder = Instance.new("Frame")
-			Holder.Size = UDim2.new(1, 0, 0, 42)
+			Holder.Size = UDim2.new(1, 0, 0, hasDesc and 42 or 36)
 			Holder.BackgroundTransparency = 1
 			Holder.ZIndex = 3
 			Holder.Parent = Page
 
 			local TitleLbl = Instance.new("TextLabel")
-			TitleLbl.Size = UDim2.new(0, 0, 0, 18)
-			TitleLbl.Position = UDim2.new(0, 0, 0, 2)
-			TitleLbl.AutomaticSize = Enum.AutomaticSize.X
+			-- Fills layout if no description, ensuring flawless vertical centering alongside the toggle
+			TitleLbl.Size = UDim2.new(1, -60, hasDesc and 0 or 1, hasDesc and 18 or 0)
+			TitleLbl.Position = UDim2.new(0, 0, 0, hasDesc and 2 or 0)
 			TitleLbl.BackgroundTransparency = 1
 			TitleLbl.Text = name
 			TitleLbl.Font = Theme.Font
@@ -1005,7 +1007,7 @@ function AstralisLib:CreateWindow(config)
 			TitleLbl.ZIndex = 4
 			TitleLbl.Parent = Holder
 
-			if desc ~= "" then
+			if hasDesc then
 				local DescLbl = Instance.new("TextLabel")
 				DescLbl.Size = UDim2.new(1, -60, 0, 14)
 				DescLbl.Position = UDim2.new(0, 0, 0, 22)
@@ -1360,15 +1362,17 @@ function AstralisLib:CreateWindow(config)
 			local currentColor = default
 			local pickerOpen = false
 
+			local hasDesc = (desc ~= nil and desc ~= "")
+
 			local Holder = Instance.new("Frame")
-			Holder.Size = UDim2.new(1, 0, 0, 42)
+			Holder.Size = UDim2.new(1, 0, 0, hasDesc and 42 or 36)
 			Holder.BackgroundTransparency = 1
 			Holder.ZIndex = 3
 			Holder.Parent = Page
 
 			local TitleLbl = Instance.new("TextLabel")
-			TitleLbl.Size = UDim2.new(1, -70, 0, 18)
-			TitleLbl.Position = UDim2.new(0, 0, 0, 2)
+			TitleLbl.Size = UDim2.new(1, -70, hasDesc and 0 or 1, hasDesc and 18 or 0)
+			TitleLbl.Position = UDim2.new(0, 0, 0, hasDesc and 2 or 0)
 			TitleLbl.BackgroundTransparency = 1
 			TitleLbl.Text = name
 			TitleLbl.Font = Theme.Font
@@ -1378,7 +1382,7 @@ function AstralisLib:CreateWindow(config)
 			TitleLbl.ZIndex = 4
 			TitleLbl.Parent = Holder
 
-			if desc ~= "" then
+			if hasDesc then
 				local DescLbl = Instance.new("TextLabel")
 				DescLbl.Size = UDim2.new(1, -70, 0, 14)
 				DescLbl.Position = UDim2.new(0, 0, 0, 22)
