@@ -24,7 +24,6 @@ local function noSelect(obj)
 	obj.SelectionImageObject = blank
 end
 
--- icon lookup (optional - you can pass raw asset ids instead)
 local ICONS = {
 	home     = "rbxassetid://76558027491744",
 	user     = "rbxassetid://132274181926139",
@@ -820,7 +819,7 @@ function AstralisLib:CreateWindow(config)
 	UserInputService.InputBegan:Connect(function(input)
 		if UserInputService:GetFocusedTextBox() then return end
 		if input.KeyCode == Theme.Keybind then
-				uiVisible = not uiVisible
+			uiVisible = not uiVisible
 			ScreenGui.Enabled = uiVisible
 			playSound()
 		end
@@ -1125,6 +1124,8 @@ function AstralisLib:CreateWindow(config)
 			ValLbl.Font = Theme.Font
 			ValLbl.TextSize = 13
 			ValLbl.TextColor3 = Theme.SliderTextColor
+			ValLbl.TextXAlignment = Enum.TextXAlignment.Center
+			ValLbl.TextYAlignment = Enum.TextYAlignment.Center
 			ValLbl.ZIndex = 6
 			ValLbl.Parent = Track
 
