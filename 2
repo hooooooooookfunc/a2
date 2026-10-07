@@ -91,6 +91,7 @@ function AstralisLib:CreateWindow(config)
 		ButtonTextColor = config.ButtonTextColor or Color3.fromRGB(220, 220, 225),
 		TextColor = config.TextColor or Color3.fromRGB(225, 225, 230),
 		DescriptionColor = config.DescriptionColor or Color3.fromRGB(130, 130, 140),
+		StrokeColor = config.StrokeColor or Color3.fromRGB(40, 40, 44),
 
 		OutlineColor = config.OutlineColor or Color3.fromRGB(60, 60, 66),
 		OutlineThickness = config.OutlineThickness or 1.2,
@@ -1356,6 +1357,342 @@ function AstralisLib:CreateWindow(config)
 				playSound()
 				callback(Box.Text)
 			end)
+		end
+
+		function TabObj:CreateColorPicker(options)
+			options = options or {}
+			local name = options.Name or "Color Picker"
+			local desc = options.Description or ""
+			local default = options.Default or Theme.AccentColor
+			local callback = options.Callback or function() end
+			local currentColor = default
+			local pickerOpen = false
+
+			local Holder = Instance.new("Frame")
+			Holder.Size = UDim2.new(1, 0, 0, 42)
+			Holder.BackgroundTransparency = 1
+			Holder.ZIndex = 3
+			Holder.Parent = Page
+
+			local TitleLbl = Instance.new("TextLabel")
+			TitleLbl.Size = UDim2.new(1, -70, 0, 18)
+			TitleLbl.Position = UDim2.new(0, 0, 0, 2)
+			TitleLbl.BackgroundTransparency = 1
+			TitleLbl.Text = name
+			TitleLbl.Font = Theme.Font
+			TitleLbl.TextSize = 15
+			TitleLbl.TextColor3 = Theme.TextColor
+			TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLbl.ZIndex = 4
+			TitleLbl.Parent = Holder
+
+			if desc ~= "" then
+				local DescLbl = Instance.new("TextLabel")
+				DescLbl.Size = UDim2.new(1, -70, 0, 14)
+				DescLbl.Position = UDim2.new(0, 0, 0, 22)
+				DescLbl.BackgroundTransparency = 1
+				DescLbl.Text = desc
+				DescLbl.Font = Theme.Font
+				DescLbl.TextSize = 12
+				DescLbl.TextColor3 = Theme.DescriptionColor
+				DescLbl.TextXAlignment = Enum.TextXAlignment.Left
+				DescLbl.ZIndex = 4
+				DescLbl.Parent = Holder
+			end
+
+			local Preview = Instance.new("TextButton")
+			Preview.Size = UDim2.new(0, 34, 0, 26)
+			Preview.AnchorPoint = Vector2.new(1, 0.5)
+			Preview.Position = UDim2.new(1, 0, 0.5, 0)
+			Preview.BackgroundColor3 = currentColor
+			Preview.BorderSizePixel = 0
+			Preview.Text = ""
+			Preview.AutoButtonColor = false
+			Preview.Modal = true
+			Preview.ZIndex = 5
+			Preview.Parent = Holder
+
+			addCorner(Preview, 5)
+			noSelect(Preview)
+
+			local PreviewStroke = Instance.new("UIStroke")
+			PreviewStroke.Color = Theme.StrokeColor
+			PreviewStroke.Thickness = 1
+			PreviewStroke.Parent = Preview
+
+			local Popup = Instance.new("Frame")
+			Popup.Size = UDim2.new(0, 220, 0, 238)
+			Popup.AnchorPoint = Vector2.new(1, 0)
+			Popup.Position = UDim2.new(1, 0, 1, 6)
+			Popup.BackgroundColor3 = Theme.BackgroundColor
+			Popup.BorderSizePixel = 0
+			Popup.Visible = false
+			Popup.ZIndex = 20
+			Popup.Parent = Holder
+
+			addCorner(Popup, 7)
+
+			local PopupStroke = Instance.new("UIStroke")
+			PopupStroke.Color = Theme.StrokeColor
+			PopupStroke.Thickness = 1
+			PopupStroke.Parent = Popup
+
+			local PopupPadding = Instance.new("UIPadding")
+			PopupPadding.PaddingTop = UDim.new(0, 10)
+			PopupPadding.PaddingBottom = UDim.new(0, 10)
+			PopupPadding.PaddingLeft = UDim.new(0, 10)
+			PopupPadding.PaddingRight = UDim.new(0, 10)
+			PopupPadding.Parent = Popup
+
+			local SV = Instance.new("Frame")
+			SV.Size = UDim2.new(1, 0, 0, 150)
+			SV.BackgroundColor3 = Color3.fromHSV(0, 1, 1)
+			SV.BorderSizePixel = 0
+			SV.ZIndex = 21
+			SV.Parent = Popup
+
+			addCorner(SV, 5)
+
+			local SVWhite = Instance.new("Frame")
+			SVWhite.Size = UDim2.new(1, 0, 1, 0)
+			SVWhite.BackgroundColor3 = Color3.new(1, 1, 1)
+			SVWhite.BackgroundTransparency = 0
+			SVWhite.BorderSizePixel = 0
+			SVWhite.ZIndex = 22
+			SVWhite.Parent = SV
+
+			local WhiteGradient = Instance.new("UIGradient")
+			WhiteGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0),
+				NumberSequenceKeypoint.new(1, 1)
+			})
+			WhiteGradient.Rotation = 0
+			WhiteGradient.Parent = SVWhite
+
+			local SVBlack = Instance.new("Frame")
+			SVBlack.Size = UDim2.new(1, 0, 1, 0)
+			SVBlack.BackgroundColor3 = Color3.new(0, 0, 0)
+			SVBlack.BorderSizePixel = 0
+			SVBlack.ZIndex = 23
+			SVBlack.Parent = SV
+
+			local BlackGradient = Instance.new("UIGradient")
+			BlackGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 1),
+				NumberSequenceKeypoint.new(1, 0)
+			})
+			BlackGradient.Rotation = 90
+			BlackGradient.Parent = SVBlack
+
+			local SVMarker = Instance.new("Frame")
+			SVMarker.Size = UDim2.new(0, 10, 0, 10)
+			SVMarker.AnchorPoint = Vector2.new(0.5, 0.5)
+			SVMarker.BackgroundColor3 = Color3.new(1, 1, 1)
+			SVMarker.BorderSizePixel = 0
+			SVMarker.ZIndex = 24
+			SVMarker.Parent = SV
+
+			addCorner(SVMarker, 5)
+
+			local SVStroke = Instance.new("UIStroke")
+			SVStroke.Color = Color3.new(0, 0, 0)
+			SVStroke.Thickness = 1
+			SVStroke.Parent = SVMarker
+
+			local Hue = Instance.new("Frame")
+			Hue.Size = UDim2.new(1, 0, 0, 12)
+			Hue.Position = UDim2.new(0, 0, 0, 158)
+			Hue.BackgroundColor3 = Color3.new(1, 1, 1)
+			Hue.BorderSizePixel = 0
+			Hue.ZIndex = 21
+			Hue.Parent = Popup
+
+			addCorner(Hue, 4)
+
+			local HueGradient = Instance.new("UIGradient")
+			HueGradient.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+				ColorSequenceKeypoint.new(0.166, Color3.fromRGB(255, 255, 0)),
+				ColorSequenceKeypoint.new(0.333, Color3.fromRGB(0, 255, 0)),
+				ColorSequenceKeypoint.new(0.500, Color3.fromRGB(0, 255, 255)),
+				ColorSequenceKeypoint.new(0.666, Color3.fromRGB(0, 0, 255)),
+				ColorSequenceKeypoint.new(0.833, Color3.fromRGB(255, 0, 255)),
+				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))
+			})
+			HueGradient.Parent = Hue
+
+			local HueMarker = Instance.new("Frame")
+			HueMarker.Size = UDim2.new(0, 6, 0, 16)
+			HueMarker.AnchorPoint = Vector2.new(0.5, 0.5)
+			HueMarker.BackgroundColor3 = Color3.new(1, 1, 1)
+			HueMarker.BorderSizePixel = 0
+			HueMarker.ZIndex = 22
+			HueMarker.Parent = Hue
+
+			addCorner(HueMarker, 2)
+
+			local HexBox = Instance.new("TextBox")
+			HexBox.Size = UDim2.new(1, -72, 0, 28)
+			HexBox.Position = UDim2.new(0, 0, 0, 182)
+			HexBox.BackgroundColor3 = Theme.ButtonBackground
+			HexBox.BorderSizePixel = 0
+			HexBox.Text = "#" .. currentColor:ToHex()
+			HexBox.PlaceholderText = "#RRGGBB"
+			HexBox.PlaceholderColor3 = Theme.DescriptionColor
+			HexBox.Font = Theme.Font
+			HexBox.TextSize = 12
+			HexBox.TextColor3 = Theme.TextColor
+			HexBox.ClearTextOnFocus = false
+			HexBox.TextXAlignment = Enum.TextXAlignment.Left
+			HexBox.ZIndex = 21
+			HexBox.Parent = Popup
+
+			addCorner(HexBox, 4)
+
+			local HexPadding = Instance.new("UIPadding")
+			HexPadding.PaddingLeft = UDim.new(0, 8)
+			HexPadding.Parent = HexBox
+
+			local ResetBtn = Instance.new("TextButton")
+			ResetBtn.Size = UDim2.new(0, 62, 0, 28)
+			ResetBtn.Position = UDim2.new(1, -62, 0, 182)
+			ResetBtn.BackgroundColor3 = Theme.ButtonBackground
+			ResetBtn.BorderSizePixel = 0
+			ResetBtn.Text = "Reset"
+			ResetBtn.Font = Theme.Font
+			ResetBtn.TextSize = 12
+			ResetBtn.TextColor3 = Theme.ButtonTextColor
+			ResetBtn.AutoButtonColor = false
+			ResetBtn.Modal = true
+			ResetBtn.ZIndex = 21
+			ResetBtn.Parent = Popup
+
+			addCorner(ResetBtn, 4)
+			noSelect(ResetBtn)
+
+			local hue, saturation, value = Color3.toHSV(currentColor)
+
+			local function setColor(color, fireCallback)
+				color = color or currentColor
+				currentColor = color
+				hue, saturation, value = Color3.toHSV(currentColor)
+				Preview.BackgroundColor3 = currentColor
+				SV.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+				SVMarker.Position = UDim2.new(saturation, 0, 1 - value, 0)
+				HueMarker.Position = UDim2.new(hue, 0, 0.5, 0)
+				HexBox.Text = "#" .. currentColor:ToHex()
+
+				if fireCallback then
+					callback(currentColor)
+				end
+			end
+
+			local function updateFromSV(input)
+				local x = math.clamp((input.Position.X - SV.AbsolutePosition.X) / SV.AbsoluteSize.X, 0, 1)
+				local y = math.clamp((input.Position.Y - SV.AbsolutePosition.Y) / SV.AbsoluteSize.Y, 0, 1)
+				saturation = x
+				value = 1 - y
+				setColor(Color3.fromHSV(hue, saturation, value), true)
+			end
+
+			local function updateFromHue(input)
+				local x = math.clamp((input.Position.X - Hue.AbsolutePosition.X) / Hue.AbsoluteSize.X, 0, 1)
+				hue = x
+				setColor(Color3.fromHSV(hue, saturation, value), true)
+			end
+
+			local svDragging = false
+			local hueDragging = false
+
+			SV.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1
+					or input.UserInputType == Enum.UserInputType.Touch then
+					svDragging = true
+					updateFromSV(input)
+				end
+			end)
+
+			Hue.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1
+					or input.UserInputType == Enum.UserInputType.Touch then
+					hueDragging = true
+					updateFromHue(input)
+				end
+			end)
+
+			UserInputService.InputChanged:Connect(function(input)
+				if svDragging and (
+					input.UserInputType == Enum.UserInputType.MouseMovement
+					or input.UserInputType == Enum.UserInputType.Touch
+				) then
+					updateFromSV(input)
+				elseif hueDragging and (
+					input.UserInputType == Enum.UserInputType.MouseMovement
+					or input.UserInputType == Enum.UserInputType.Touch
+				) then
+					updateFromHue(input)
+				end
+			end)
+
+			UserInputService.InputEnded:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1
+					or input.UserInputType == Enum.UserInputType.Touch then
+					svDragging = false
+					hueDragging = false
+				end
+			end)
+
+			HexBox.FocusLost:Connect(function()
+				local hex = HexBox.Text:gsub("#", ""):gsub("%s+", "")
+				if #hex == 6 and hex:match("^[%x]+$") then
+					local r = tonumber(hex:sub(1, 2), 16)
+					local g = tonumber(hex:sub(3, 4), 16)
+					local b = tonumber(hex:sub(5, 6), 16)
+					if r and g and b then
+						setColor(Color3.fromRGB(r, g, b), true)
+						return
+					end
+				end
+				HexBox.Text = "#" .. currentColor:ToHex()
+			end)
+
+			ResetBtn.MouseButton1Click:Connect(function()
+				playSound()
+				setColor(default, true)
+			end)
+
+			local function setOpen(state)
+				pickerOpen = state
+				Popup.Visible = state
+
+				if state then
+					setColor(currentColor, false)
+				end
+			end
+
+			Preview.MouseButton1Click:Connect(function()
+				playSound()
+				setOpen(not pickerOpen)
+			end)
+
+			setColor(currentColor, false)
+
+			return {
+				Set = function(_, color)
+					if typeof(color) == "Color3" then
+						setColor(color, true)
+					end
+				end,
+				Get = function()
+					return currentColor
+				end,
+				Open = function()
+					setOpen(true)
+				end,
+				Close = function()
+					setOpen(false)
+				end
+			}
 		end
 
 		return TabObj
